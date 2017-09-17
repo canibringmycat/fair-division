@@ -1,0 +1,23 @@
+2 players:
+    - 20 items: 0.534s
+    - 21 items: 1.990s
+    - 22 items: 2.293s
+    - 23 items: 4.744s
+    - 24 items: 9.778s
+    - 25 items: 20.254s
+    - 26 items: 41.965s
+    - 27 items: 88.823s
+
+3 players:
+    - 13 items: 0.608s
+    - 14 items: 1.911s
+    - 15 items: 6.146s
+    - 16 items: 19.297s
+    - 17 items: 60.770s
+
+4 players:
+    - 10 items: 0.382s
+    - 11 items: 1.609s
+    - 12 items: 8.720s
+    - 13 items: 37.699s
+
