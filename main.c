@@ -312,9 +312,10 @@ int main() {
     /*mnw_allocation(arr, 3, 10);*/
     /*destroy_array(arr);*/
 
+    // test proportion of envy-free
     int i;
     float p;
-    for (i = 1; i <= 20; i++) {
+    for (i = 1; i <= 10; i++) {
         p = percent_ef_test(1, 3, i);
         printf("Percent Envy Free for %d item(s): %f\n", i, p);
     }
