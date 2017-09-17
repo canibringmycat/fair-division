@@ -125,7 +125,6 @@ void destroy_array(float ** arr) {
 
 
 /* Given valuations and partition, determine if envy free */
-/*int envy_free(int vals[n_rows][n_cols], int partition[n_cols], int vals_r, int vals_c) {*/
 int envy_free(float ** vals, int partition[n_cols], int vals_r, int vals_c) {
     int self, i, j, envy, other;
     float self_score, other_score;
@@ -156,16 +155,110 @@ int envy_free(float ** vals, int partition[n_cols], int vals_r, int vals_c) {
     return envy;
 }
 
-/* Envy-Free up to 1 good, for any good you choose */
-int envy_free_1_any(int vals[n_rows][n_cols], int partition[n_cols], int vals_r, int vals_c) {
-    int self, i, j, envy, self_score, other, other_score;
-    return 0;
+/* Envy-Free up to 1 good, for any good you choose 
+ *  */
+int envy_free_1_any(float ** vals, int partition[n_cols], int vals_r, int vals_c) {
+    // create list of other's items
+    // loop through i=0 to len(list)-1 times, each time leaving out the i-th item
+    // if self_score < other_score for any of these, ef_1 = 0
+    // else: ef_1 = 1
+
+    int self, i, j, ef_1, other;
+    float self_score, other_score;
+    ef_1 = 0;
+
+    int others_items[vals_c];
+    for (i = 0; i < vals_c; i++) {
+        others_items[i] = -1;
+    }
+
+    for (self = 0; self < vals_r; self++) {
+        self_score = 0;
+        for (i = 0; i < vals_c; i++) {
+            if (partition[i] == self) {
+                self_score += vals[self][i];
+            }
+        }
+
+        for (other = 0; other < vals_r; other++) {
+            if (other == self) {
+                continue;
+            }
+
+            int count = 0;
+            for (j = 0; j < vals_c; j++) {
+                if (partition[j] == other) {
+                    others_items[count] = j;
+                    count++;
+                }
+            }
+            // for j=count; j < vals_c; j++
+            for (i = 0; i < vals_c; i++) {
+                int skip = others_items[i];
+                other_score = 0;
+                for (j = 0; j < vals_c; j++) {
+                    if (others_items[j] != -1 & others_items[j] != skip) {
+                        other_score += vals[self][j];
+                    }
+                }
+                if (self_score > other_score) {
+                    ef_1 = 1;
+                }
+            }
+        }
+    }
+
+    return ef_1;
 }
 
 /* Envy-Free up to 1 good, for all possible goods chosen */
-int envy_free_1_all(int vals[n_rows][n_cols], int partition[n_cols], int vals_r, int vals_c) {
-    int self, i, j, envy, self_score, other, other_score;
-    return 0;
+int envy_free_1_all(float ** vals, int partition[n_cols], int vals_r, int vals_c) {
+    int self, i, j, ef_1, other;
+    float self_score, other_score;
+    ef_1 = 1;
+
+    int others_items[vals_c];
+    for (i = 0; i < vals_c; i++) {
+        others_items[i] = -1;
+    }
+
+    for (self = 0; self < vals_r; self++) {
+        self_score = 0;
+        for (i = 0; i < vals_c; i++) {
+            if (partition[i] == self) {
+                self_score += vals[self][i];
+            }
+        }
+
+        for (other = 0; other < vals_r; other++) {
+            if (other == self) {
+                continue;
+            }
+
+            int count = 0;
+            for (j = 0; j < vals_c; j++) {
+                if (partition[j] == other) {
+                    others_items[count] = j;
+                    count++;
+                }
+            }
+            // for j=count; j < vals_c; j++
+            for (i = 0; i < vals_c; i++) {
+                int skip = others_items[i];
+                other_score = 0;
+                for (j = 0; j < vals_c; j++) {
+                    if (others_items[j] != -1 & others_items[j] != skip) {
+                        other_score += vals[self][j];
+                    }
+                }
+                if (self_score < other_score) {
+                    ef_1 = 0;
+                }
+            }
+        }
+    }
+
+    return ef_1;
 }
 
 
@@ -263,7 +356,11 @@ int mnw_allocation(float ** vals, int vals_r, int vals_c) {
         }
     }
 
-    int envy = envy_free(vals, max_partition, vals_r, vals_c);
+    // int envy = envy_free(vals, max_partition, vals_r, vals_c);
+    
+    //int ef_1_any = envy_free_1_any(vals, max_partition, vals_r, vals_c);
+    
+    int ef_1_all = envy_free_1_all(vals, max_partition, vals_r, vals_c);
     
     /*printf("MNW solution: [");*/
     /*for (int i = 0; i < vals_c; i++) {*/
@@ -273,7 +370,11 @@ int mnw_allocation(float ** vals, int vals_r, int vals_c) {
     /*printf("MNW product: %f\n", max_product);*/
     /*printf("Envy-Free: %d\n", 1 - envy);*/
 
-    return (1 - envy);
+    return ef_1_all;
+    
+    // return ef_1_any;
+
+    // return (1 - envy);
 }
 
 
@@ -316,11 +417,15 @@ int main() {
     int i;
     float p;
     for (i = 1; i <= 10; i++) {
-        p = percent_ef_test(1, 3, i);
+        p = percent_ef_test(10, 3, i);
         printf("Percent Envy Free for %d item(s): %f\n", i, p);
     }
     /*float percent = percent_ef_test(1000, 3, 5);*/
     /*printf("Percent Envy Free = %f\n", percent);*/
+
+
+    // test for ef1-any
+    //
 
     return 0;
 }
